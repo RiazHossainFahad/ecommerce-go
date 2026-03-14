@@ -1,26 +1,32 @@
 package cmd
 
 import (
+	"ecommerce/config"
 	"ecommerce/middleware"
 	"fmt"
 	"net/http"
+	"strconv"
 )
 
 func Serve() {
+	cnf := config.GetConfig()
+
+	addr := ":" + strconv.Itoa(cnf.HttpPort)
+
 	mux := http.NewServeMux() // router
 
 	manager := middleware.NewManager()
 
 	getRoutes(mux, manager)
 
-	fmt.Println("Server running on port :3000")
+	fmt.Printf("Server running on port %s", addr)
 
 	// will execute top to bottom
 	manager.Use(middleware.AddLog)
 	manager.Use(middleware.HandleCors)
 	manager.Use(middleware.Preflight)
 
-	err := http.ListenAndServe(":3000", manager.WrapMux(
+	err := http.ListenAndServe(addr, manager.WrapMux(
 		mux,
 	)) // which port
 
