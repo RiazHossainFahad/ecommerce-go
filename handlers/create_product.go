@@ -12,25 +12,41 @@ func StoreProduct(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&newProduct)
 	if err != nil {
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		util.ErrorResponse(w, "Invalid JSON", http.StatusBadRequest)
 		return
 	}
 
-	for i := 0; i < len(db.ProductList); i++ {
-		if newProduct.Title == "" {
-			util.ErrorResponse(w, "Title required.", http.StatusUnprocessableEntity)
-			return
+	products := db.GetProductList()
+
+	status, messsage := validateProduct(newProduct, products, false)
+	if !status {
+		util.ErrorResponse(w, messsage, http.StatusUnprocessableEntity)
+		return
+	}
+
+	newProduct.ID = len(products) + 1
+
+	db.StoreProduct(newProduct)
+
+	util.SuccessResponse(w, newProduct, http.StatusCreated)
+}
+
+func validateProduct(product db.Product, products []db.Product, isUpdate bool) (bool, string) {
+	for i := 0; i < len(products); i++ {
+		if product.Title == "" {
+			return false, "Title required."
 		}
 
-		if db.ProductList[i].Title == newProduct.Title {
-			util.ErrorResponse(w, "Already exists", http.StatusUnprocessableEntity)
-			return
+		if !isUpdate {
+			if products[i].Title == product.Title {
+				return false, "Already exists"
+			}
+		} else {
+			if products[i].Title == product.Title && products[i].ID == product.ID {
+				return false, "Already exists"
+			}
 		}
 	}
 
-	newProduct.ID = len(db.ProductList) + 1
-
-	db.ProductList = append(db.ProductList, newProduct)
-
-	util.SuccessResponse(w, newProduct, http.StatusCreated)
+	return true, ""
 }

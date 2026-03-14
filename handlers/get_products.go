@@ -7,5 +7,5 @@ import (
 )
 
 func GetProducts(w http.ResponseWriter, r *http.Request) {
-	util.SuccessResponse(w, db.ProductList, http.StatusOK)
+	util.SuccessResponse(w, db.GetProductList(), http.StatusOK)
 }

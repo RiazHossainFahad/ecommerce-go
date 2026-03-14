@@ -19,7 +19,7 @@ func Serve() {
 
 	getRoutes(mux, manager)
 
-	fmt.Printf("Server running on port %s", addr)
+	fmt.Printf("Server running on port %s\n", addr)
 
 	// will execute top to bottom
 	manager.Use(middleware.AddLog)
