@@ -5,9 +5,8 @@ import (
 )
 
 // MIDDLEWARE
-// func handleCorsMiddleware(next http.HandlerFunc) http.HandlerFunc {
-func HandleCorsMiddleware(mux *http.ServeMux) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func HandleCors(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Allow specific origins
 		// allowedOrigins := map[string]bool{
 		// 	"http://localhost:3000": true,
@@ -25,12 +24,6 @@ func HandleCorsMiddleware(mux *http.ServeMux) http.HandlerFunc {
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		w.Header().Set("Content-Type", "application/json")
 
-		// Handle preflight
-		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-
-		mux.ServeHTTP(w, r)
-	}
+		next.ServeHTTP(w, r)
+	})
 }
