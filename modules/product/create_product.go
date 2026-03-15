@@ -1,4 +1,4 @@
-package handlers
+package product
 
 import (
 	"ecommerce/db"
@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func StoreProduct(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) StoreProduct(w http.ResponseWriter, r *http.Request) {
 	var newProduct db.Product
 
 	err := json.NewDecoder(r.Body).Decode(&newProduct)

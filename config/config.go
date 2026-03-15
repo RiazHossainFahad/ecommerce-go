@@ -15,7 +15,7 @@ type Config struct {
 	JwtSecret string
 }
 
-var configurations Config
+var configurations *Config
 
 func loadConfig() {
 	err := godotenv.Load()
@@ -50,7 +50,7 @@ func loadConfig() {
 		log.Fatal("Env error: JWT_SECRET is missing")
 	}
 
-	configurations = Config{
+	configurations = &Config{
 		Version:   version,
 		AppName:   appName,
 		HttpPort:  actualPort,
@@ -58,8 +58,11 @@ func loadConfig() {
 	}
 }
 
-func GetConfig() Config {
-	loadConfig()
+// Singleton Design Pattern: creates one n share with all
+func GetConfig() *Config {
+	if configurations == nil {
+		loadConfig()
+	}
 
 	return configurations
 }
