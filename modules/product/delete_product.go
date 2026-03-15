@@ -1,7 +1,6 @@
 package product
 
 import (
-	"ecommerce/db"
 	"ecommerce/util"
 	"net/http"
 	"strconv"
@@ -16,9 +15,9 @@ func (h *Handler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	status, messsage := db.DeleteProduct(id)
-	if !status {
-		util.ErrorResponse(w, messsage, http.StatusUnprocessableEntity)
+	err = h.productRepo.Delete(id)
+	if err != nil {
+		util.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

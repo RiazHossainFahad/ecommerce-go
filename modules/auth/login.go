@@ -1,8 +1,6 @@
 package auth
 
 import (
-	"ecommerce/config"
-	"ecommerce/db"
 	"ecommerce/util"
 	"encoding/json"
 	"net/http"
@@ -22,13 +20,13 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := db.FindUser(loginRequest.Email, loginRequest.Password)
+	user, err := h.userRepo.Find(loginRequest.Email, loginRequest.Password)
 	if user == nil {
 		util.ErrorResponse(w, "Invalid credentials. Please try again.", http.StatusBadRequest)
 		return
 	}
 
-	jwtSecret := config.GetConfig().JwtSecret
+	jwtSecret := h.cnf.JwtSecret
 	jwtToken, err := util.CreateJwtToken(jwtSecret, util.Payload{
 		Sub:         user.ID,
 		FirstName:   user.FirstName,

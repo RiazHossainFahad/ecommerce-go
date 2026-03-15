@@ -1,7 +1,6 @@
 package product
 
 import (
-	"ecommerce/db"
 	"ecommerce/util"
 	"encoding/json"
 	"net/http"
@@ -17,7 +16,7 @@ func (h *Handler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var product db.Product
+	product := h.productRepo.EmptyProduct()
 
 	jsonErr := json.NewDecoder(r.Body).Decode(&product)
 	if jsonErr != nil {
@@ -25,7 +24,12 @@ func (h *Handler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	products := db.GetProductList()
+	products, err := h.productRepo.List()
+
+	if err != nil {
+		util.ErrorResponse(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 
 	status, messsage := validateProduct(product, products, true)
 	if !status {
@@ -35,11 +39,11 @@ func (h *Handler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 
 	product.ID = id
 
-	status, messsage = db.UpdateProduct(id, product)
-	if !status {
+	dbProduct, err := h.productRepo.Update(id, product)
+	if err != nil {
 		util.ErrorResponse(w, messsage, http.StatusUnprocessableEntity)
 		return
 	}
 
-	util.SuccessResponse(w, map[string]any{"status": true, "messsage": messsage}, http.StatusAccepted)
+	util.SuccessResponse(w, dbProduct, http.StatusAccepted)
 }

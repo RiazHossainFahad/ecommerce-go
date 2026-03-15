@@ -1,14 +1,14 @@
 package product
 
 import (
-	"ecommerce/db"
+	"ecommerce/repo"
 	"ecommerce/util"
 	"encoding/json"
 	"net/http"
 )
 
 func (h *Handler) StoreProduct(w http.ResponseWriter, r *http.Request) {
-	var newProduct db.Product
+	newProduct := h.productRepo.EmptyProduct()
 
 	err := json.NewDecoder(r.Body).Decode(&newProduct)
 	if err != nil {
@@ -16,7 +16,12 @@ func (h *Handler) StoreProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	products := db.GetProductList()
+	products, err := h.productRepo.List()
+
+	if err != nil {
+		util.ErrorResponse(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 
 	status, messsage := validateProduct(newProduct, products, false)
 	if !status {
@@ -26,12 +31,17 @@ func (h *Handler) StoreProduct(w http.ResponseWriter, r *http.Request) {
 
 	newProduct.ID = len(products) + 1
 
-	db.StoreProduct(newProduct)
+	product, err := h.productRepo.Store(newProduct)
 
-	util.SuccessResponse(w, newProduct, http.StatusCreated)
+	if err != nil {
+		util.ErrorResponse(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	util.SuccessResponse(w, product, http.StatusCreated)
 }
 
-func validateProduct(product db.Product, products []db.Product, isUpdate bool) (bool, string) {
+func validateProduct(product repo.Product, products []*repo.Product, isUpdate bool) (bool, string) {
 	for i := 0; i < len(products); i++ {
 		if product.Title == "" {
 			return false, "Title required."

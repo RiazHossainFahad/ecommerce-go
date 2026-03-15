@@ -1,13 +1,13 @@
 package product
 
-import "ecommerce/config"
+import "ecommerce/repo"
 
 type Handler struct {
-	cnf *config.Config
+	productRepo repo.ProductRepo
 }
 
-func NewHandler(cnf *config.Config) *Handler {
+func NewHandler(productRepo repo.ProductRepo) *Handler {
 	return &Handler{
-		cnf: cnf,
+		productRepo: productRepo,
 	}
 }

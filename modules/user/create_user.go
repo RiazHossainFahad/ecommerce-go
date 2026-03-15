@@ -1,14 +1,14 @@
 package user
 
 import (
-	"ecommerce/db"
+	"ecommerce/repo"
 	"ecommerce/util"
 	"encoding/json"
 	"net/http"
 )
 
 func (h *Handler) StoreUser(w http.ResponseWriter, r *http.Request) {
-	var newUser db.User
+	newUser := h.userRepo.EmptyUser()
 
 	err := json.NewDecoder(r.Body).Decode(&newUser)
 	if err != nil {
@@ -16,7 +16,11 @@ func (h *Handler) StoreUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	users := db.GetUserList()
+	users, err := h.userRepo.List()
+	if err != nil {
+		util.ErrorResponse(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	status, messsage := validateUser(newUser, users, false)
 	if !status {
@@ -26,12 +30,16 @@ func (h *Handler) StoreUser(w http.ResponseWriter, r *http.Request) {
 
 	newUser.ID = len(users) + 1
 
-	db.StoreUser(newUser)
+	user, err := h.userRepo.Store(newUser)
+	if err != nil {
+		util.ErrorResponse(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-	util.SuccessResponse(w, newUser, http.StatusCreated)
+	util.SuccessResponse(w, user, http.StatusCreated)
 }
 
-func validateUser(user db.User, users []db.User, isUpdate bool) (bool, string) {
+func validateUser(user repo.User, users []*repo.User, isUpdate bool) (bool, string) {
 	for i := 0; i < len(users); i++ {
 		if user.Email == "" {
 			return false, "Email is required."
