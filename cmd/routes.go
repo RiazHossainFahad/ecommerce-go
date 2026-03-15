@@ -18,6 +18,7 @@ func getRoutes(mux *http.ServeMux, manager *middleware.Manager) {
 		"POST /products",
 		manager.With(
 			http.HandlerFunc(handlers.StoreProduct),
+			middleware.Authenticate,
 		),
 	)
 	mux.Handle(
@@ -30,12 +31,14 @@ func getRoutes(mux *http.ServeMux, manager *middleware.Manager) {
 		"PUT /products/{id}",
 		manager.With(
 			http.HandlerFunc(handlers.UpdateProduct),
+			middleware.Authenticate,
 		),
 	)
 	mux.Handle(
 		"DELETE /products/{id}",
 		manager.With(
 			http.HandlerFunc(handlers.DeleteProduct),
+			middleware.Authenticate,
 		),
 	)
 

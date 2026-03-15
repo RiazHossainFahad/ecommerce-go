@@ -20,7 +20,7 @@ type Payload struct {
 	IsShopOwner bool   `json:"is_shop_owner"`
 }
 
-func CreateJWT(secret string, data Payload) (string, error) {
+func CreateJwtToken(secret string, data Payload) (string, error) {
 	header := Header{
 		Alg: "HS256",
 		Typ: "JWT",
@@ -31,14 +31,14 @@ func CreateJWT(secret string, data Payload) (string, error) {
 		return "", err
 	}
 
-	b64Header := convertToBase64(byteArrHeader)
+	b64Header := ConvertToBase64(byteArrHeader)
 
 	byteArrPayload, err := json.Marshal(data)
 	if err != nil {
 		return "", err
 	}
 
-	b64Payload := convertToBase64(byteArrPayload)
+	b64Payload := ConvertToBase64(byteArrPayload)
 
 	byteMessage := []byte(b64Header + "." + b64Payload)
 	byteSecret := []byte(secret)
@@ -46,13 +46,13 @@ func CreateJWT(secret string, data Payload) (string, error) {
 	hash := hmac.New(sha256.New, byteSecret)
 	hash.Write(byteMessage)
 	signature := hash.Sum(nil)
-	b64Signature := convertToBase64(signature)
+	b64Signature := ConvertToBase64(signature)
 
 	jwt := b64Header + "." + b64Payload + "." + b64Signature
 
 	return jwt, nil
 }
 
-func convertToBase64(data []byte) string {
+func ConvertToBase64(data []byte) string {
 	return base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(data)
 }

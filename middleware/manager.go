@@ -26,7 +26,7 @@ func (manager *Manager) With(next http.Handler, middlewares ...Middleware) http.
 	// need to pass the data reverse order [Preflight, HandleCors]
 	// HandleCors(Preflight(next))
 	// for _, middleware := range middlewares {
-	// 	n = middleware(n)j
+	// 	n = middleware(n)
 	// }
 
 	for i := len(middlewares) - 1; i >= 0; i-- {

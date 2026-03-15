@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"ecommerce/config"
 	"ecommerce/db"
 	"ecommerce/util"
 	"encoding/json"
@@ -27,5 +28,24 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	util.SuccessResponse(w, user, http.StatusOK)
+	jwtSecret := config.GetConfig().JwtSecret
+	jwtToken, err := util.CreateJwtToken(jwtSecret, util.Payload{
+		Sub:         user.ID,
+		FirstName:   user.FirstName,
+		LastName:    user.LastName,
+		Email:       user.Email,
+		IsShopOwner: user.IsShopOwner,
+	})
+	if err != nil {
+		util.ErrorResponse(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	res := make(map[string]any)
+
+	res["status"] = true
+	res["user"] = user
+	res["token"] = jwtToken
+
+	util.SuccessResponse(w, res, http.StatusOK)
 }

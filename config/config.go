@@ -9,9 +9,10 @@ import (
 )
 
 type Config struct {
-	Version  string
-	AppName  string
-	HttpPort int
+	Version   string
+	AppName   string
+	HttpPort  int
+	JwtSecret string
 }
 
 var configurations Config
@@ -44,10 +45,16 @@ func loadConfig() {
 		log.Fatal("Env error: Invalid HTTP_PORT given\nError: ", err)
 	}
 
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		log.Fatal("Env error: JWT_SECRET is missing")
+	}
+
 	configurations = Config{
-		Version:  version,
-		AppName:  appName,
-		HttpPort: actualPort,
+		Version:   version,
+		AppName:   appName,
+		HttpPort:  actualPort,
+		JwtSecret: jwtSecret,
 	}
 }
 
