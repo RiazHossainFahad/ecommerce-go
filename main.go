@@ -3,6 +3,7 @@ package main
 import (
 	"ecommerce/cmd"
 	"ecommerce/config"
+	"ecommerce/middleware"
 	"ecommerce/modules/auth"
 	"ecommerce/modules/product"
 	"ecommerce/modules/user"
@@ -16,6 +17,10 @@ func main() {
 	productRepo := repo.NewProductRepo()
 	userRepo := repo.NewUserRepo()
 
+	middlewareHanlder := middleware.NewMiddlewareHandler(
+		cnf,
+	)
+
 	server := cmd.NewServer(
 		cnf,
 		user.NewHandler(userRepo),
@@ -23,7 +28,7 @@ func main() {
 			cnf,
 			userRepo,
 		),
-		product.NewHandler(productRepo),
+		product.NewHandler(productRepo, middlewareHanlder),
 	)
 
 	server.StartServer()

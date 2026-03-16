@@ -1,13 +1,21 @@
 package product
 
-import "ecommerce/repo"
+import (
+	"ecommerce/middleware"
+	"ecommerce/repo"
+)
 
 type Handler struct {
-	productRepo repo.ProductRepo
+	productRepo      repo.ProductRepo
+	midlewareHandler *middleware.MiddlewareHandler
 }
 
-func NewHandler(productRepo repo.ProductRepo) *Handler {
+func NewHandler(
+	productRepo repo.ProductRepo,
+	midlewareHandler *middleware.MiddlewareHandler,
+) *Handler {
 	return &Handler{
-		productRepo: productRepo,
+		productRepo:      productRepo,
+		midlewareHandler: midlewareHandler,
 	}
 }
