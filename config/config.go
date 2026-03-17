@@ -13,6 +13,13 @@ type Config struct {
 	AppName   string
 	HttpPort  int
 	JwtSecret string
+
+	DbHost     string
+	DbPort     int
+	DbUser     string
+	DbPassword string
+	DbName     string
+	DbSslMode  string
 }
 
 var configurations *Config
@@ -50,11 +57,54 @@ func loadConfig() {
 		log.Fatal("Env error: JWT_SECRET is missing")
 	}
 
+	dbHost := os.Getenv("DB_HOST")
+	if dbHost == "" {
+		log.Fatal("Env error: DB_HOST is missing")
+	}
+
+	dbPort := os.Getenv("DB_PORT")
+	if dbPort == "" {
+		log.Fatal("Env error: DB_PORT is missing")
+	}
+
+	actualDbPort, err := strconv.Atoi(dbPort)
+	if err != nil {
+		log.Fatal("Env error: Invalid DB_PORT given\nError: ", err)
+	}
+
+	dbUser := os.Getenv("DB_USER")
+	if dbUser == "" {
+		log.Fatal("Env error: DB_USER is missing")
+	}
+
+	dbPassword := os.Getenv("DB_PASSWORD")
+	if dbPassword == "" {
+		log.Fatal("Env error: DB_PASSWORD is missing")
+	}
+
+	dbName := os.Getenv("DB_NAME")
+	if dbName == "" {
+		log.Fatal("Env error: DB_NAME is missing")
+	}
+
+	dbSslMode := os.Getenv("DB_SSLMODE")
+	if dbSslMode == "" {
+		log.Fatal("Env error: DB_SSLMODE is missing")
+	}
+
 	configurations = &Config{
 		Version:   version,
 		AppName:   appName,
 		HttpPort:  actualPort,
 		JwtSecret: jwtSecret,
+
+		// DB
+		DbHost:     dbHost,
+		DbPort:     actualDbPort,
+		DbUser:     dbUser,
+		DbPassword: dbPassword,
+		DbName:     dbName,
+		DbSslMode:  dbSslMode,
 	}
 }
 

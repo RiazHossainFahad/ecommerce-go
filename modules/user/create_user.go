@@ -28,8 +28,6 @@ func (h *Handler) StoreUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newUser.ID = len(users) + 1
-
 	user, err := h.userRepo.Store(newUser)
 	if err != nil {
 		util.ErrorResponse(w, err.Error(), http.StatusBadRequest)
@@ -54,7 +52,7 @@ func validateUser(user repo.User, users []*repo.User, isUpdate bool) (bool, stri
 				return false, "Already exists"
 			}
 		} else {
-			if users[i].Email == user.Email && users[i].ID == user.ID {
+			if users[i].Email == user.Email && users[i].ID != user.ID {
 				return false, "Already exists"
 			}
 		}
