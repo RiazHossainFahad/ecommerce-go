@@ -41,7 +41,7 @@ func (h *Handler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 
 	dbProduct, err := h.productRepo.Update(id, product)
 	if err != nil {
-		util.ErrorResponse(w, messsage, http.StatusUnprocessableEntity)
+		util.ErrorResponse(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
 

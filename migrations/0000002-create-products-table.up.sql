@@ -1,0 +1,11 @@
+-- +migrate Up
+
+CREATE TABLE IF NOT EXISTS products (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(100) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    price REAL NOT NULL,
+    img_url VARCHAR(255) NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);

@@ -2,6 +2,7 @@ package product
 
 import (
 	"ecommerce/util"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -18,6 +19,7 @@ func (h *Handler) GetProduct(w http.ResponseWriter, r *http.Request) {
 	product, err := h.productRepo.Get(id)
 	if err != nil {
 		util.ErrorResponse(w, "Internal Server Error", http.StatusInternalServerError)
+		log.Println(err)
 		return
 	}
 
