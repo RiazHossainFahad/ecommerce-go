@@ -49,7 +49,7 @@ func main() {
 		usrHandler.NewHandler(userDomain),
 		authHandler.NewHandler(
 			cnf,
-			userRepo,
+			userDomain,
 		),
 		prdctHandler.NewHandler(prodctDomain, middlewareHanlder),
 	)
