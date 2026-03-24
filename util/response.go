@@ -22,3 +22,8 @@ func ErrorResponse(w http.ResponseWriter, message string, statusCode int) {
 		Message: message,
 	})
 }
+
+func SendPaginatedData(w http.ResponseWriter, r *http.Request, data interface{}, page, limit, totalItems int) {
+	response := NewPaginationBuilder(r, data, page, limit, totalItems).Build()
+	SuccessResponse(w, response, http.StatusOK)
+}

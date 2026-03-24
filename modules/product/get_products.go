@@ -37,5 +37,5 @@ func (h *Handler) GetProducts(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 
-	util.SendPaginatedData(w, list, page, limit, count)
+	util.SendPaginatedData(w, r, list, page, limit, count)
 }
