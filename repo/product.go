@@ -1,31 +1,15 @@
 package repo
 
 import (
+	"ecommerce/domain"
+	"ecommerce/product"
 	"errors"
-	"time"
 
 	"github.com/jmoiron/sqlx"
 )
 
 type ProductRepo interface {
-	EmptyProduct() Product
-
-	List() ([]*Product, error)
-	Store(Product) (*Product, error)
-	Get(int) (*Product, error)
-	Update(int, Product) (*Product, error)
-	Delete(int) error
-	Exists(int) (bool, error)
-}
-
-type Product struct {
-	ID          int        `json:"id" db:"id"` // tag
-	Title       string     `json:"title" db:"title"`
-	Description string     `json:"description" db:"description"`
-	Price       float64    `json:"price" db:"price"`
-	ImgUrl      string     `json:"img_url" db:"img_url"`
-	CreatedAt   *time.Time `json:"-" db:"created_at"`
-	UpdatedAt   *time.Time `json:"-" db:"updated_at"`
+	product.ProductRepo
 }
 
 type productRepo struct {
@@ -43,8 +27,8 @@ func NewProductRepo(db *sqlx.DB) ProductRepo {
 
 }
 
-func (r *productRepo) EmptyProduct() Product {
-	return Product{}
+func (r *productRepo) EmptyProduct() domain.Product {
+	return domain.Product{}
 }
 
 func (r *productRepo) Exists(id int) (bool, error) {
@@ -63,7 +47,7 @@ func (r *productRepo) Exists(id int) (bool, error) {
 	return exists, err
 }
 
-func (r *productRepo) Store(p Product) (*Product, error) {
+func (r *productRepo) Store(p domain.Product) (*domain.Product, error) {
 	query := `
 		INSERT INTO products (
 			title,
@@ -94,8 +78,8 @@ func (r *productRepo) Store(p Product) (*Product, error) {
 	return &p, nil
 }
 
-func (r *productRepo) List() ([]*Product, error) {
-	var products []*Product
+func (r *productRepo) List() ([]*domain.Product, error) {
+	var products []*domain.Product
 
 	query := `
 		SELECT 
@@ -109,8 +93,8 @@ func (r *productRepo) List() ([]*Product, error) {
 	return products, err
 }
 
-func (r *productRepo) Get(id int) (*Product, error) {
-	var product Product
+func (r *productRepo) Get(id int) (*domain.Product, error) {
+	var product domain.Product
 
 	query := `
 		SELECT 
@@ -124,7 +108,7 @@ func (r *productRepo) Get(id int) (*Product, error) {
 	return &product, err
 }
 
-func (r *productRepo) Update(id int, p Product) (*Product, error) {
+func (r *productRepo) Update(id int, p domain.Product) (*domain.Product, error) {
 
 	exists, err := r.Exists(id)
 	if err != nil {
@@ -183,7 +167,7 @@ func (r *productRepo) Delete(id int) error {
 }
 
 func generateInitialProduct(r *productRepo) {
-	r.Store(Product{
+	r.Store(domain.Product{
 		ID:          1,
 		Title:       "Orange",
 		Description: "Orange is yellow",
@@ -191,7 +175,7 @@ func generateInitialProduct(r *productRepo) {
 		ImgUrl:      "https://www.quanta.org/thumbs/thumb-orange-640x480-orange.jpg",
 	})
 
-	r.Store(Product{
+	r.Store(domain.Product{
 		ID:          2,
 		Title:       "Apple",
 		Description: "Apple is red",
@@ -199,7 +183,7 @@ func generateInitialProduct(r *productRepo) {
 		ImgUrl:      "https://www.quanta.org/thumbs/thumb-apple-640x480-apple.jpg",
 	})
 
-	r.Store(Product{
+	r.Store(domain.Product{
 		ID:          3,
 		Title:       "Banana",
 		Description: "Banana is yellow",
@@ -207,7 +191,7 @@ func generateInitialProduct(r *productRepo) {
 		ImgUrl:      "https://www.quanta.org/thumbs/thumb-banana-640x480-banana.png",
 	})
 
-	r.Store(Product{
+	r.Store(domain.Product{
 		ID:          4,
 		Title:       "Pomegranate",
 		Description: "Pomegranate is red",
@@ -215,7 +199,7 @@ func generateInitialProduct(r *productRepo) {
 		ImgUrl:      "https://shegrowsveg.com/wp-content/uploads/2024/11/Pomegranate-2-2048x2048-1.jpg",
 	})
 
-	r.Store(Product{
+	r.Store(domain.Product{
 		ID:          5,
 		Title:       "Lemon",
 		Description: "Lemon is yellow",

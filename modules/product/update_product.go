@@ -16,7 +16,7 @@ func (h *Handler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	product := h.productRepo.EmptyProduct()
+	product := h.productService.EmptyProduct()
 
 	jsonErr := json.NewDecoder(r.Body).Decode(&product)
 	if jsonErr != nil {
@@ -24,7 +24,7 @@ func (h *Handler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	products, err := h.productRepo.List()
+	products, err := h.productService.List()
 
 	if err != nil {
 		util.ErrorResponse(w, "Internal Server Error", http.StatusInternalServerError)
@@ -39,7 +39,7 @@ func (h *Handler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 
 	product.ID = id
 
-	dbProduct, err := h.productRepo.Update(id, product)
+	dbProduct, err := h.productService.Update(id, product)
 	if err != nil {
 		util.ErrorResponse(w, err.Error(), http.StatusUnprocessableEntity)
 		return
