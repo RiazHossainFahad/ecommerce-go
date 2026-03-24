@@ -16,8 +16,8 @@ func (svc service) EmptyProduct() domain.Product {
 	return svc.productRepo.EmptyProduct()
 }
 
-func (svc service) List() ([]*domain.Product, error) {
-	productList, err := svc.productRepo.List()
+func (svc service) List(page, limit int) ([]*domain.Product, error) {
+	productList, err := svc.productRepo.List(page, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -68,4 +68,17 @@ func (svc service) Exists(id int) (bool, error) {
 	}
 
 	return isExist, nil
+}
+
+func (svc service) Unique(name string, id int) (bool, error) {
+	isExist, err := svc.productRepo.Unique(name, id)
+	if err != nil {
+		return false, err
+	}
+
+	return isExist, nil
+}
+
+func (svc service) Count() (int, error) {
+	return svc.productRepo.Count()
 }

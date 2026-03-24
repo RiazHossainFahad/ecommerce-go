@@ -16,20 +16,11 @@ func (h *Handler) StoreProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	products, err := h.productService.List()
-
-	if err != nil {
-		util.ErrorResponse(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	status, messsage := validateProduct(newProduct, products, false)
+	status, messsage := validateProduct(h, newProduct)
 	if !status {
 		util.ErrorResponse(w, messsage, http.StatusUnprocessableEntity)
 		return
 	}
-
-	newProduct.ID = len(products) + 1
 
 	product, err := h.productService.Store(newProduct)
 
@@ -41,21 +32,19 @@ func (h *Handler) StoreProduct(w http.ResponseWriter, r *http.Request) {
 	util.SuccessResponse(w, product, http.StatusCreated)
 }
 
-func validateProduct(product domain.Product, products []*domain.Product, isUpdate bool) (bool, string) {
-	for i := 0; i < len(products); i++ {
-		if product.Title == "" {
-			return false, "Title required."
-		}
+func validateProduct(h *Handler, product domain.Product) (bool, string) {
+	if product.Title == "" {
+		return false, "Title required."
+	}
 
-		if !isUpdate {
-			if products[i].Title == product.Title {
-				return false, "Already exists"
-			}
-		} else {
-			if products[i].Title == product.Title && products[i].ID == product.ID {
-				return false, "Already exists"
-			}
-		}
+	exists, err := h.productService.Unique(product.Title, product.ID)
+
+	if err != nil {
+		return false, err.Error()
+	}
+
+	if exists {
+		return false, "Product already exists"
 	}
 
 	return true, ""

@@ -47,6 +47,31 @@ func (r *productRepo) Exists(id int) (bool, error) {
 	return exists, err
 }
 
+func (r *productRepo) Unique(title string, id int) (bool, error) {
+	var exists bool
+
+	query := `
+		SELECT EXISTS(
+			SELECT 1
+			FROM products 
+			WHERE title = $1
+	`
+
+	args := []interface{}{title}
+
+	// If id > 0, exclude that record from the check
+	if id > 0 {
+		query += ` AND id != $2`
+		args = append(args, id)
+	}
+
+	query += `)`
+
+	err := r.db.Get(&exists, query, args...)
+
+	return exists, err
+}
+
 func (r *productRepo) Store(p domain.Product) (*domain.Product, error) {
 	query := `
 		INSERT INTO products (
@@ -78,19 +103,33 @@ func (r *productRepo) Store(p domain.Product) (*domain.Product, error) {
 	return &p, nil
 }
 
-func (r *productRepo) List() ([]*domain.Product, error) {
+func (r *productRepo) List(page, limit int) ([]*domain.Product, error) {
 	var products []*domain.Product
 
 	query := `
 		SELECT 
 			*
 		FROM products
-		ORDER BY
-			id
+		LIMIT $1
+		OFFSET $2
 	`
 
-	err := r.db.Select(&products, query)
+	offset := (page - 1) * limit
+	err := r.db.Select(&products, query, limit, offset)
 	return products, err
+}
+
+func (r *productRepo) Count() (int, error) {
+	var count int
+
+	query := `
+		SELECT 
+			COUNT(id)
+		FROM products
+	`
+
+	err := r.db.Get(&count, query)
+	return count, err
 }
 
 func (r *productRepo) Get(id int) (*domain.Product, error) {

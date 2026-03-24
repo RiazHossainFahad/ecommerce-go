@@ -24,20 +24,13 @@ func (h *Handler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	products, err := h.productService.List()
+	product.ID = id
 
-	if err != nil {
-		util.ErrorResponse(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	status, messsage := validateProduct(product, products, true)
+	status, messsage := validateProduct(h, product)
 	if !status {
 		util.ErrorResponse(w, messsage, http.StatusUnprocessableEntity)
 		return
 	}
-
-	product.ID = id
 
 	dbProduct, err := h.productService.Update(id, product)
 	if err != nil {
