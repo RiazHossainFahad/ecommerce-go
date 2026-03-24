@@ -5,11 +5,12 @@ import (
 	"ecommerce/config"
 	"ecommerce/infra/db"
 	"ecommerce/middleware"
-	"ecommerce/modules/auth"
+	authHandler "ecommerce/modules/auth"
 	prdctHandler "ecommerce/modules/product"
 	usrHandler "ecommerce/modules/user"
 	"ecommerce/product"
 	"ecommerce/repo"
+	"ecommerce/user"
 	"fmt"
 	"log"
 	"os"
@@ -37,6 +38,7 @@ func main() {
 
 	// Domains
 	prodctDomain := product.NewService(productRepo)
+	userDomain := user.NewService(userRepo)
 
 	middlewareHanlder := middleware.NewMiddlewareHandler(
 		cnf,
@@ -44,8 +46,8 @@ func main() {
 
 	server := cmd.NewServer(
 		cnf,
-		usrHandler.NewHandler(userRepo),
-		auth.NewHandler(
+		usrHandler.NewHandler(userDomain),
+		authHandler.NewHandler(
 			cnf,
 			userRepo,
 		),

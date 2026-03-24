@@ -1,14 +1,14 @@
 package user
 
 import (
-	"ecommerce/repo"
+	"ecommerce/domain"
 	"ecommerce/util"
 	"encoding/json"
 	"net/http"
 )
 
 func (h *Handler) StoreUser(w http.ResponseWriter, r *http.Request) {
-	newUser := h.userRepo.EmptyUser()
+	newUser := h.svc.EmptyUser()
 
 	err := json.NewDecoder(r.Body).Decode(&newUser)
 	if err != nil {
@@ -16,7 +16,7 @@ func (h *Handler) StoreUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	users, err := h.userRepo.List()
+	users, err := h.svc.List()
 	if err != nil {
 		util.ErrorResponse(w, err.Error(), http.StatusBadRequest)
 		return
@@ -28,7 +28,7 @@ func (h *Handler) StoreUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.userRepo.Store(newUser)
+	user, err := h.svc.Store(newUser)
 	if err != nil {
 		util.ErrorResponse(w, err.Error(), http.StatusBadRequest)
 		return
@@ -37,7 +37,7 @@ func (h *Handler) StoreUser(w http.ResponseWriter, r *http.Request) {
 	util.SuccessResponse(w, user, http.StatusCreated)
 }
 
-func validateUser(user repo.User, users []*repo.User, isUpdate bool) (bool, string) {
+func validateUser(user domain.User, users []*domain.User, isUpdate bool) (bool, string) {
 	for i := 0; i < len(users); i++ {
 		if user.Email == "" {
 			return false, "Email is required."

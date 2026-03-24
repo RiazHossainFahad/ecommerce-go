@@ -1,13 +1,11 @@
 package user
 
-import "ecommerce/repo"
-
 type Handler struct {
-	userRepo repo.UserRepo
+	svc Service
 }
 
-func NewHandler(userRepo repo.UserRepo) *Handler {
+func NewHandler(svc Service) *Handler {
 	return &Handler{
-		userRepo: userRepo,
+		svc: svc,
 	}
 }

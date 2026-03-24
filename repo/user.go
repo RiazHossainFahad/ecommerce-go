@@ -1,28 +1,14 @@
 package repo
 
 import (
-	"time"
+	"ecommerce/domain"
+	"ecommerce/user"
 
 	"github.com/jmoiron/sqlx"
 )
 
 type UserRepo interface {
-	EmptyUser() User
-
-	List() ([]*User, error)
-	Store(User) (*User, error)
-	Find(email, password string) (*User, error)
-}
-
-type User struct {
-	ID          int        `json:"id" db:"id"` // tag
-	FirstName   string     `json:"first_name" db:"first_name"`
-	LastName    string     `json:"last_name" db:"last_name"`
-	Email       string     `json:"email" db:"email"`
-	Password    string     `json:"password" db:"password"`
-	IsShopOwner bool       `json:"is_shop_owner" db:"is_shop_owner"`
-	CreatedAt   *time.Time `json:"-" db:"created_at"`
-	UpdatedAt   *time.Time `json:"-" db:"updated_at"`
+	user.UserRepo
 }
 
 type userRepo struct {
@@ -35,17 +21,17 @@ func NewUserRepo(db *sqlx.DB) UserRepo {
 	}
 }
 
-func (r *userRepo) EmptyUser() User {
-	return User{}
+func (r *userRepo) EmptyUser() domain.User {
+	return domain.User{}
 }
 
-func (r *userRepo) List() ([]*User, error) {
-	var users []*User
+func (r *userRepo) List() ([]*domain.User, error) {
+	var users []*domain.User
 	err := r.db.Select(&users, "SELECT * FROM users ORDER BY id")
 	return users, err
 }
 
-func (r *userRepo) Store(user User) (*User, error) {
+func (r *userRepo) Store(user domain.User) (*domain.User, error) {
 	var id int
 	query := `INSERT INTO users (
 		first_name,
@@ -77,8 +63,8 @@ func (r *userRepo) Store(user User) (*User, error) {
 	return &user, nil
 }
 
-func (r *userRepo) Find(email, password string) (*User, error) {
-	var user User
+func (r *userRepo) Find(email, password string) (*domain.User, error) {
+	var user domain.User
 
 	err := r.db.Get(&user, "SELECT * FROM users WHERE email=$1 AND password=$2", email, password)
 
